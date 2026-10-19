@@ -20,6 +20,8 @@ use taffy_benchmarks::morphorm_helpers::MorphormTree;
 use taffy_benchmarks::taffy_03_helpers::Taffy03TreeBuilder;
 #[cfg(feature = "torin")]
 use taffy_benchmarks::torin_helpers::TorinTree;
+#[cfg(feature = "ui-layout")]
+use taffy_benchmarks::ui_layout_helpers::UiLayoutTree;
 #[cfg(feature = "yoga")]
 use taffy_benchmarks::yoga_helpers::YogaTreeBuilder;
 
@@ -206,6 +208,14 @@ fn benchmark_native_libraries(group: &mut BenchmarkGroup<WallTime>, name: &str, 
         let mut tree = Some(tree);
         group.bench_function(BenchmarkId::new(name, "Morphorm"), |b| {
             bench_layout(b, &mut tree, || unreachable!(), |_| {}, |tree| tree.compute_layout())
+        });
+    }
+
+    #[cfg(feature = "ui-layout")]
+    if let Some(tree) = UiLayoutTree::new(root, width, height) {
+        let mut tree = Some(tree);
+        group.bench_function(BenchmarkId::new(name, "ui_layout"), |b| {
+            bench_layout(b, &mut tree, || unreachable!(), |tree| tree.mark_all_dirty(), |tree| tree.compute_layout())
         });
     }
 

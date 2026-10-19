@@ -732,6 +732,7 @@ dependencies = [
  "taffy 0.15.0",
  "taffy 0.3.19",
  "torin",
+ "ui_layout",
  "yoga",
 ]
 
@@ -787,6 +788,11 @@ checksum = "db97caf9d906fbde555dd62fa95ddba9eecfd14cb388e4f491a66d74cd5fb79a"
 dependencies = [
  "once_cell",
 ]
+
+[[package]]
+name = "ui_layout"
+version = "0.12.1"
+source = "git+https://github.com/098orin/ui_layout-rs?rev=cffdbc4bc0e4f54b9a4466847528fbfa2127648a#cffdbc4bc0e4f54b9a4466847528fbfa2127648a"
 
 [[package]]
 name = "unicode-ident"

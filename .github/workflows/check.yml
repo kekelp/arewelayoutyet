@@ -24,7 +24,7 @@ jobs:
           workspaces: benchmarks
       - name: Install Yoga build dependencies
         run: sudo apt-get update && sudo apt-get install --yes libclang-dev
-      - run: cargo check --manifest-path benchmarks/Cargo.toml --locked --bench pangui --features morphorm,torin,yoga
+      - run: cargo check --manifest-path benchmarks/Cargo.toml --locked --bench pangui --features morphorm,torin,yoga,ui-layout
       - name: Check JavaScript syntax
         run: |
           for script in scripts/*.mjs site/*.js; do
