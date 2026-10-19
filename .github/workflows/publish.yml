@@ -69,52 +69,22 @@ jobs:
             benchmarks/target/criterion/**/new/benchmark.json
           retention-days: 30
           if-no-files-found: ignore
-      - name: Save the generated website for deployment
-        uses: actions/upload-artifact@v4
+      - name: Upload the generated website for GitHub Pages
+        uses: actions/upload-pages-artifact@v3
         with:
-          name: website
           path: dist
-          retention-days: 7
-          if-no-files-found: error
 
   deploy:
     needs: benchmark
     runs-on: ubuntu-24.04
     timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
     environment:
-      name: production
-      url: ${{ steps.deployment.outputs.url }}
-    env:
-      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - uses: actions/checkout@v4
-        with:
-          persist-credentials: false
-      - name: Check deployment credentials
-        run: |
-          for variable in VERCEL_TOKEN VERCEL_ORG_ID VERCEL_PROJECT_ID; do
-            if [ -z "${!variable}" ]; then
-              echo "::error::Missing GitHub Actions secret: $variable"
-              exit 1
-            fi
-          done
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-      - uses: actions/download-artifact@v4
-        with:
-          name: website
-          path: dist
-      - name: Install Vercel CLI
-        run: npm install --global vercel@64.7.0
-      - name: Load the Vercel project settings
-        run: vercel pull --yes --environment=production --token "$VERCEL_TOKEN"
-      - name: Prepare the prebuilt static deployment
-        run: node scripts/prepare-vercel.mjs
-      - name: Deploy to Vercel
+      - name: Deploy GitHub Pages
         id: deployment
-        run: |
-          deployment_url="$(vercel deploy --prebuilt --prod --yes --token "$VERCEL_TOKEN")"
-          printf 'url=%s\n' "$deployment_url" >> "$GITHUB_OUTPUT"
+        uses: actions/deploy-pages@v4
