@@ -31,6 +31,19 @@ function renderFeatures(data) {
   }
   head.append(headings);
   const body = element('tbody');
+  const releaseRow = element('tr', undefined, 'release-date');
+  const releaseHeading = element('th', 'Release date');
+  releaseHeading.scope = 'row';
+  releaseRow.append(releaseHeading);
+  for (const library of data.libraries) {
+    const cell = element('td');
+    const date = element('time', library.releaseDate);
+    date.dateTime = library.releaseDate;
+    date.title = 'Publication date on crates.io for the listed version. Git-pinned builds may include newer changes.';
+    cell.append(date);
+    releaseRow.append(cell);
+  }
+  body.append(releaseRow);
   for (const feature of data.features) {
     const row = element('tr');
     const heading = element('th', feature.name);
@@ -90,6 +103,7 @@ function renderBenchmarks(history, libraries) {
     for (const scenario of scenarios) {
       const results = run.results.filter(result => result.scenario === scenario && libraries.some(library => library.id === result.library));
       const fastestMean = Math.min(...results.map(result => result.mean_ns));
+      const slowestMean = Math.max(...results.map(result => result.mean_ns));
       const row = element('tr');
       const heading = element('th', scenario.replaceAll('_', ' '));
       heading.scope = 'row';
@@ -98,8 +112,14 @@ function renderBenchmarks(history, libraries) {
         const result = results.find(result => result.library === library.id);
         const cell = element('td');
         if (result) {
-          const mean = element('span', formatTime(result.mean_ns), result.mean_ns === fastestMean ? 'yes' : undefined);
-          if (result.mean_ns === fastestMean) mean.title = 'Lowest mean time in this row';
+          const mean = element('span', formatTime(result.mean_ns));
+          if (result.mean_ns === fastestMean) {
+            mean.className = 'yes';
+            mean.title = 'Lowest mean time in this row';
+          } else if (result.mean_ns === slowestMean) {
+            mean.className = 'worst';
+            mean.title = 'Highest mean time in this row';
+          }
           cell.append(mean, element('small', `${formatTime(result.lower_ns)} to ${formatTime(result.upper_ns)}`));
         } else {
           const missing = element('span', '/', 'small');

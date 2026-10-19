@@ -22,8 +22,9 @@ p { line-height: 1.7; }
 footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; padding-bottom: 24px !important; }
 .legend { display: flex; flex-wrap: wrap; gap: 24px; font-size: 12px; margin-bottom: 16px; }
 .yes { color: #6dd49b; }
+.worst { color: #f08080; }
 .different { color: #d4d4d8; }
-.no, .unknown { color: var(--muted); }
+.no, .unknown, .release-date { color: var(--muted); }
 .table-scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; }
 table { border-collapse: collapse; width: 100%; background: var(--panel); font-size: 13px; }
 caption { text-align: left; padding: 15px; color: var(--muted); font-size: 12px; }

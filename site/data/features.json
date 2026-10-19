@@ -1,11 +1,11 @@
 {
   "reviewed": "2026-10-19",
   "libraries": [
-    {"id": "taffy", "name": "Taffy", "version": "0.15.0 (pinned Git)", "url": "https://crates.io/crates/taffy", "source": "https://github.com/DioxusLabs/taffy/tree/4e59968eda29ceeb0bbaeb3993c8cd38baa3d0a6/src/style"},
-    {"id": "morphorm", "name": "Morphorm", "version": "0.9.0", "url": "https://crates.io/crates/morphorm", "source": "https://docs.rs/morphorm/0.9.0/morphorm/trait.Node.html"},
-    {"id": "torin", "name": "Torin", "version": "0.5.0-rc.10", "url": "https://crates.io/crates/torin", "source": "https://docs.rs/torin/0.5.0-rc.10/torin/node/struct.Node.html"},
-    {"id": "yoga", "name": "Yoga", "version": "0.5.0 (C++ bindings)", "url": "https://crates.io/crates/yoga", "source": "https://docs.rs/yoga/0.5.0/yoga/struct.Node.html"},
-    {"id": "ui_layout", "name": "ui-layout (WIP 🚧)", "version": "0.12.1 (pinned Git, WIP)", "url": "https://crates.io/crates/ui_layout", "source": "https://github.com/098orin/ui_layout-rs/blob/cffdbc4bc0e4f54b9a4466847528fbfa2127648a/src/style.rs"}
+    {"id": "taffy", "name": "Taffy", "version": "0.15.0 (pinned Git)", "releaseDate": "2026-10-12", "url": "https://crates.io/crates/taffy", "source": "https://github.com/DioxusLabs/taffy/tree/4e59968eda29ceeb0bbaeb3993c8cd38baa3d0a6/src/style"},
+    {"id": "morphorm", "name": "Morphorm", "version": "0.9.0", "releaseDate": "2026-07-17", "url": "https://crates.io/crates/morphorm", "source": "https://docs.rs/morphorm/0.9.0/morphorm/trait.Node.html"},
+    {"id": "torin", "name": "Torin", "version": "0.5.0-rc.10", "releaseDate": "2026-10-11", "url": "https://crates.io/crates/torin", "source": "https://docs.rs/torin/0.5.0-rc.10/torin/node/struct.Node.html"},
+    {"id": "yoga", "name": "Yoga", "version": "0.5.0 (C++ bindings)", "releaseDate": "2025-01-16", "url": "https://crates.io/crates/yoga", "source": "https://docs.rs/yoga/0.5.0/yoga/struct.Node.html"},
+    {"id": "ui_layout", "name": "ui-layout (WIP 🚧)", "version": "0.12.1 (pinned Git, WIP)", "releaseDate": "2026-08-01", "url": "https://crates.io/crates/ui_layout", "source": "https://github.com/098orin/ui_layout-rs/blob/cffdbc4bc0e4f54b9a4466847528fbfa2127648a/src/style.rs"}
   ],
   "features": [
     {"name": "Horizontal and vertical stacks", "support": ["yes", "yes", "yes", "yes", "yes"], "note": "Row and column flows. This does not imply CSS flexbox conformance."},
