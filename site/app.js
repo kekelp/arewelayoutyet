@@ -10,6 +10,16 @@ const link = (text, url) => {
   node.href = url;
   return node;
 };
+function badge(description, url) {
+  const image = element('img', undefined, 'metric-badge');
+  image.alt = description;
+  image.src = url;
+  image.height = 20;
+  image.loading = 'lazy';
+  image.decoding = 'async';
+  image.addEventListener('error', () => image.replaceWith(element('span', '/')));
+  return image;
+}
 async function loadJson(path) {
   const response = await fetch(path, { cache: 'no-cache' });
   if (!response.ok) throw new Error(`Could not load ${path} (${response.status})`);
@@ -44,6 +54,37 @@ function renderFeatures(data) {
     releaseRow.append(cell);
   }
   body.append(releaseRow);
+  const downloadsRow = element('tr', undefined, 'downloads');
+  const downloadsHeading = element('th', 'crates.io downloads');
+  downloadsHeading.scope = 'row';
+  downloadsRow.append(downloadsHeading);
+  for (const library of data.libraries) {
+    const cell = element('td');
+    const crateLink = link(undefined, `${library.url}/downloads`);
+    crateLink.title = `All-time downloads of the ${library.id} Rust crate across all versions`;
+    crateLink.append(badge(`Total crates.io downloads for ${library.id}`,
+      `https://img.shields.io/crates/d/${encodeURIComponent(library.id)}?style=flat&color=555&labelColor=333&label=total`));
+    cell.append(crateLink);
+    downloadsRow.append(cell);
+  }
+  body.append(downloadsRow);
+  const usedByRow = element('tr', undefined, 'used-by');
+  const usedByHeading = element('th', 'Used by');
+  usedByHeading.scope = 'row';
+  usedByRow.append(usedByHeading);
+  for (const library of data.libraries) {
+    const cell = element('td');
+    library.usedBy.forEach((project, index) => {
+      if (index > 0) cell.append(', ');
+      const projectLink = link(project.name, project.url);
+      if (project.note) projectLink.title = project.note;
+      cell.append(projectLink);
+      if (project.note) cell.append(element('small', project.note));
+    });
+    if (!library.usedBy.length) cell.append('/');
+    usedByRow.append(cell);
+  }
+  body.append(usedByRow);
   for (const feature of data.features) {
     const row = element('tr');
     const heading = element('th', feature.name);

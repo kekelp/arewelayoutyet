@@ -23,7 +23,7 @@ p { line-height: 1.7; }
 .yes, .different { color: #6dd49b; }
 .worst { color: #f08080; }
 .partial { color: #d4d4d8; }
-.no, .unknown, .release-date { color: var(--muted); }
+.no, .unknown, .release-date, .downloads, .used-by { color: var(--muted); }
 .table-scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; }
 table { border-collapse: collapse; width: 100%; background: var(--panel); font-size: 13px; }
 caption { text-align: left; padding: 15px; color: var(--muted); font-size: 12px; }
@@ -33,6 +33,9 @@ thead th { border-top: 0; padding-top: 24px; padding-bottom: 24px; font-size: 16
 th small { display: block; font-size: 10px; font-weight: 400; margin-top: 7px; color: var(--muted); }
 tbody th { font-weight: 500; }
 td a { text-decoration: none; }
+.used-by a { text-decoration: underline; }
+.used-by td small { display: block; margin-top: 5px; font-size: 10px; }
+.metric-badge { display: inline-block; max-width: 100%; vertical-align: middle; }
 tbody tr:hover { background: #222; }
 section[aria-labelledby="benchmark-heading"] { padding: 20px 0; }
 #benchmark-results { font-size: 12px; line-height: 1.3; }

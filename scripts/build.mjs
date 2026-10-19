@@ -9,6 +9,11 @@ for (const library of features.libraries) {
   for (const field of ['url', 'source']) assert.equal(new URL(library[field]).protocol, 'https:');
   assert.match(library.releaseDate, /^\d{4}-\d{2}-\d{2}$/, `Invalid release date for ${library.id}`);
   assert.equal(new Date(library.releaseDate).toISOString().slice(0, 10), library.releaseDate);
+  assert(Array.isArray(library.usedBy), `Missing project list for ${library.id}`);
+  for (const project of library.usedBy) {
+    assert(project.name, `Missing project name for ${library.id}`);
+    assert.equal(new URL(project.url).protocol, 'https:');
+  }
 }
 for (const feature of features.features) {
   assert.equal(feature.support.length, features.libraries.length, feature.name);
