@@ -1,9 +1,9 @@
 {
   "reviewed": "2026-10-19",
   "libraries": [
-    {"id": "taffy", "name": "Taffy", "version": "0.15.0 (pinned Git)", "url": "https://github.com/DioxusLabs/taffy", "source": "https://github.com/DioxusLabs/taffy/tree/4e59968eda29ceeb0bbaeb3993c8cd38baa3d0a6/src/style"},
-    {"id": "morphorm", "name": "Morphorm", "version": "0.9.0", "url": "https://github.com/vizia/morphorm", "source": "https://docs.rs/morphorm/0.9.0/morphorm/trait.Node.html"},
-    {"id": "torin", "name": "Torin", "version": "0.5.0-rc.10", "url": "https://github.com/marc2332/freya/tree/main/crates/torin", "source": "https://docs.rs/torin/0.5.0-rc.10/torin/node/struct.Node.html"}
+    {"id": "taffy", "name": "Taffy", "version": "0.15.0 (pinned Git)", "url": "https://crates.io/crates/taffy", "source": "https://github.com/DioxusLabs/taffy/tree/4e59968eda29ceeb0bbaeb3993c8cd38baa3d0a6/src/style"},
+    {"id": "morphorm", "name": "Morphorm", "version": "0.9.0", "url": "https://crates.io/crates/morphorm", "source": "https://docs.rs/morphorm/0.9.0/morphorm/trait.Node.html"},
+    {"id": "torin", "name": "Torin", "version": "0.5.0-rc.10", "url": "https://crates.io/crates/torin", "source": "https://docs.rs/torin/0.5.0-rc.10/torin/node/struct.Node.html"}
   ],
   "features": [
     {"name": "Horizontal and vertical stacks", "support": ["yes", "yes", "yes"], "note": "Row and column flows. This does not imply CSS flexbox conformance."},

@@ -7,4 +7,12 @@ fetch-data repository="":
     if [ -z "$GITHUB_REPOSITORY" ]; then
         GITHUB_REPOSITORY="$(gh repo view --json nameWithOwner --jq .nameWithOwner)"
     fi
-    python3 scripts/history.py download
+    node scripts/history.mjs download
+
+# Build and serve the website locally.
+[positional-arguments]
+serve port="8000":
+    #!/usr/bin/env bash
+    set -euo pipefail
+    node scripts/build.mjs
+    exec node scripts/serve.mjs "$1"

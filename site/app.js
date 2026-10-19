@@ -48,11 +48,96 @@ function renderFeatures(data) {
   }
   table.append(head, body);
 }
+function formatTime(nanoseconds) {
+  if (nanoseconds >= 1e6) return `${(nanoseconds / 1e6).toFixed(2)} ms`;
+  if (nanoseconds >= 1e3) return `${(nanoseconds / 1e3).toFixed(2)} µs`;
+  return `${nanoseconds.toFixed(1)} ns`;
+}
+function renderBenchmarks(history, libraries) {
+  if (history.schema !== 1 || !Array.isArray(history.runs)) throw new Error('Unsupported history format');
+  const runs = [...history.runs].sort((first, second) => second.date.localeCompare(first.date));
+  const status = document.querySelector('#benchmark-status');
+  if (!runs.length) {
+    status.textContent = 'No measurements published yet.';
+    return;
+  }
+  const select = document.querySelector('#benchmark-run');
+  select.replaceChildren();
+  runs.forEach((run, index) => {
+    const option = element('option', `${new Date(run.date).toISOString().replace('T', ' ').slice(0, 19)} UTC${index === 0 ? ' (latest)' : ''}`);
+    option.value = String(index);
+    select.append(option);
+  });
+  select.value = '0';
+  const render = () => {
+    const run = runs[Number(select.value)];
+    const table = document.querySelector('#benchmark-results');
+    table.replaceChildren(element('caption', 'Mean layout time, lower is faster. Ranges are 95% confidence intervals. Uncached layout only, adapters can differ in semantics.'));
+    const head = element('thead');
+    const headings = element('tr');
+    const workloadHeading = element('th', 'Workload');
+    workloadHeading.scope = 'col';
+    headings.append(workloadHeading);
+    for (const library of libraries) {
+      const heading = element('th');
+      heading.scope = 'col';
+      heading.append(link(library.name, library.url), element('small', run.versions[library.id] ?? library.version));
+      headings.append(heading);
+    }
+    head.append(headings);
+    const body = element('tbody');
+    const scenarios = [...new Set(run.results.map(result => result.scenario))].sort();
+    for (const scenario of scenarios) {
+      const results = run.results.filter(result => result.scenario === scenario && libraries.some(library => library.id === result.library));
+      const fastestMean = Math.min(...results.map(result => result.mean_ns));
+      const row = element('tr');
+      const heading = element('th', scenario.replaceAll('_', ' '));
+      heading.scope = 'row';
+      row.append(heading);
+      for (const library of libraries) {
+        const result = results.find(result => result.library === library.id);
+        const cell = element('td');
+        if (result) {
+          const mean = element('span', formatTime(result.mean_ns), result.mean_ns === fastestMean ? 'yes' : undefined);
+          if (result.mean_ns === fastestMean) mean.title = 'Lowest mean time in this row';
+          cell.append(mean, element('small', `${formatTime(result.lower_ns)} to ${formatTime(result.upper_ns)}`));
+        } else {
+          cell.append(element('span', '/', 'small'));
+        }
+        row.append(cell);
+      }
+      body.append(row);
+    }
+    table.append(head, body);
+    const details = document.querySelector('#run-details');
+    details.replaceChildren(`${run.cpu} · ${run.rustc} · ${run.runner}`);
+    if (run.url) details.append(' · ', link('CI run', run.url));
+    status.textContent = `${runs.length} recorded ${runs.length === 1 ? 'run' : 'runs'}. Missing results are not zero time.`;
+  };
+  select.addEventListener('change', render);
+  render();
+  document.querySelector('#benchmark-content').hidden = false;
+}
 async function main() {
+  let features;
   try {
-    renderFeatures(await loadJson('data/features.json'));
+    features = await loadJson('data/features.json');
+    renderFeatures(features);
   } catch (error) {
     document.querySelector('#features caption').textContent = `Feature data unavailable. ${error.message}`;
+  }
+  try {
+    const response = await fetch('data/history.json');
+    if (response.status === 404) {
+      document.querySelector('#benchmark-status').textContent = 'No measurements published yet. Run just fetch-data for local builds, or check the publishing workflow.';
+      return;
+    }
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    if (!features) throw new Error('Library definitions unavailable');
+    renderBenchmarks(await response.json(), features.libraries);
+  } catch (error) {
+    document.querySelector('#benchmark-content').hidden = true;
+    document.querySelector('#benchmark-status').textContent = `Measurements unavailable. ${error.message}`;
   }
 }
 main();

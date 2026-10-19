@@ -4,14 +4,15 @@ A static feature comparison of Rust UI layout engines, with daily benchmark hist
 
 ## Run locally
 
-Requires Node.js 22+, Python 3.11+, and stable Rust. No npm or Python dependencies are needed.
+Requires `just` and Node.js 22+. Stable Rust is needed only to run or export benchmarks. No npm dependencies are needed.
 
 ```sh
-node scripts/build.mjs
-python3 -m http.server 8000 --directory dist
+just serve
 ```
 
-Open `http://localhost:8000`. The website shows the feature comparison. Benchmark collection and release archiving remain enabled, but benchmark charts are not displayed.
+This builds the site and serves it on the loopback interface. Use `just serve 8080` to select a different port.
+
+Open `http://localhost:8000`. The website shows the feature comparison and a benchmark results table, with a run selector for historical measurements. Fetch published data first to display numbers locally.
 
 To fetch published measurements instead of running benchmarks, install `just` and the GitHub CLI, authenticate with `gh auth login`, then run:
 
@@ -26,7 +27,7 @@ To generate local measurements from a checkout with at least one commit:
 
 ```sh
 cargo bench --manifest-path benchmarks/Cargo.toml --locked --bench pangui --features morphorm,torin -- --noplot
-python3 scripts/collect.py
+node scripts/collect.mjs
 node scripts/build.mjs
 ```
 
@@ -65,7 +66,11 @@ For example, after inspecting the artifact from the intended repository:
 
 ```sh
 gh run download RUN_ID --repo OWNER/REPO --name benchmark-history-RUN_ID-ATTEMPT --dir recovery
-python3 -c 'import gzip,pathlib; source=pathlib.Path("recovery/site/data/history.json"); pathlib.Path("recovery/history.json.gz").write_bytes(gzip.compress(source.read_bytes(), mtime=0))'
+node --input-type=module -e '
+import { readFileSync, writeFileSync } from "node:fs"
+import { gzipSync } from "node:zlib"
+writeFileSync("recovery/history.json.gz", gzipSync(readFileSync("recovery/site/data/history.json")))
+'
 gh release upload benchmark-data recovery/history.json.gz --repo OWNER/REPO --clobber
 ```
 
@@ -77,8 +82,9 @@ Confirm the recovered archive's run count before rerunning CI. If the initial re
 - `benchmarks/benches/pangui.rs`: upstream Criterion benchmark
 - `benchmarks/pangui/`: shared workload templates
 - `site/data/features.json`: manually maintained, source-linked capabilities for pinned versions
-- `scripts/collect.py`: Criterion JSON exporter and history merge
-- `scripts/history.py`: authenticated archive download, backup, replacement, and verification
+- `scripts/collect.mjs`: Criterion JSON exporter and history merge, using Cargo metadata for resolved versions
+- `scripts/history.mjs`: authenticated archive download, backup, replacement, and verification
+- `scripts/serve.mjs`: loopback-only static server for local development
 - `.github/workflows/publish.yml`: scheduled benchmark and deployment pipeline
 
 Dependencies are locked in `benchmarks/Cargo.lock`. Upgrades are deliberate rather than automatic nightly comparisons of moving targets. The Rust stable toolchain and hosted runner can change, so their details are recorded with each run.
@@ -89,7 +95,6 @@ Missing benchmark results mean unsupported adapter translations, not zero time. 
 
 ```sh
 cargo check --manifest-path benchmarks/Cargo.toml --locked --bench pangui --features morphorm,torin
-python3 -m unittest discover -s scripts -p 'test_*.py'
 node scripts/build.mjs
 ```
 

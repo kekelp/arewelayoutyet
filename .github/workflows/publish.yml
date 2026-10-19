@@ -27,9 +27,6 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -38,11 +35,11 @@ jobs:
         with:
           workspaces: benchmarks
       - name: Download release history or initialize the first run
-        run: python3 scripts/history.py download
+        run: node scripts/history.mjs download
       - name: Run the shared layout workloads
         run: cargo bench --manifest-path benchmarks/Cargo.toml --locked --bench pangui --features morphorm,torin -- --noplot
       - name: Append this run to the full history
-        run: python3 scripts/collect.py
+        run: node scripts/collect.mjs
       - name: Build the static site
         run: node scripts/build.mjs
       - name: Stage the archive recovery files
@@ -61,7 +58,7 @@ jobs:
           retention-days: 90
           if-no-files-found: error
       - name: Replace and verify the release archive
-        run: python3 scripts/history.py upload
+        run: node scripts/history.mjs upload
       - name: Preserve Criterion estimates and benchmark metadata
         if: always()
         uses: actions/upload-artifact@v4

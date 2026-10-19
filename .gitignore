@@ -1,7 +1,6 @@
 /benchmarks/target/
 /dist/
 /.history/
-__pycache__/
 /site/data/history.json
 .bash*
 .zsh*

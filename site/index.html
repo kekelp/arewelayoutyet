@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Compare the capabilities of Rust UI layout libraries.">
-  <meta name="color-scheme" content="light dark">
+  <meta name="color-scheme" content="dark">
   <title>Are we layout yet?</title>
   <link rel="stylesheet" href="style.css">
   <script type="module" src="app.js"></script>
@@ -12,6 +12,15 @@
 <body>
   <header class="shell"><a class="brand" href="./"><span class="logo" aria-hidden="true">▦</span> are we layout yet?</a></header>
   <main class="shell">
+    <section aria-labelledby="benchmark-heading">
+      <div class="benchmark-heading"><h2 id="benchmark-heading">Benchmarks</h2><a class="small" href="data/history.json" download>Download JSON</a></div>
+      <p id="benchmark-status" class="small" role="status">Loading measurements…</p>
+      <div id="benchmark-content" hidden>
+        <label class="run-selector">Run <select id="benchmark-run"></select></label>
+        <div class="table-scroll" tabindex="0" role="region" aria-label="Layout benchmark results"><table id="benchmark-results"></table></div>
+        <p id="run-details" class="small"></p>
+      </div>
+    </section>
     <section aria-label="Library capabilities">
       <div class="legend"><span class="yes">● Supported</span><span class="different">◐ Different model</span><span class="no">○ Not supported</span><span class="unknown">? Unverified</span></div>
       <div class="table-scroll" tabindex="0" role="region" aria-label="Library feature comparison"><table id="features"><caption>Loading library features…</caption></table></div>
