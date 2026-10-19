@@ -19,11 +19,10 @@ a { color: inherit; text-underline-offset: 4px; }
 section { padding: 40px 0; }
 p { line-height: 1.7; }
 .small { font-size: 12px; color: var(--muted); }
-footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; padding-bottom: 24px !important; }
 .legend { display: flex; flex-wrap: wrap; gap: 24px; font-size: 12px; margin-bottom: 16px; }
-.yes { color: #6dd49b; }
+.yes, .different { color: #6dd49b; }
 .worst { color: #f08080; }
-.different { color: #d4d4d8; }
+.partial { color: #d4d4d8; }
 .no, .unknown, .release-date { color: var(--muted); }
 .table-scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; }
 table { border-collapse: collapse; width: 100%; background: var(--panel); font-size: 13px; }
@@ -45,6 +44,8 @@ section[aria-labelledby="benchmark-heading"] { padding: 20px 0; }
 #benchmark-results td small { display: block; margin-top: 2px; font-size: 10px; color: var(--muted); }
 .benchmark-heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
 .benchmark-heading h2 { margin: 0; font-size: 20px; }
+.benchmark-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; }
+.benchmark-actions > * { white-space: nowrap; }
 .run-selector { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 12px 0; font-size: 12px; }
 .run-selector select { max-width: 100%; padding: 6px 8px; border: 1px solid var(--line); border-radius: 4px; background: var(--panel); color: inherit; font: inherit; }
 [hidden] { display: none !important; }

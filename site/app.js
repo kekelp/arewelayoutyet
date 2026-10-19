@@ -1,4 +1,4 @@
-const labels = { yes: '● Supported', different: '◐ Different model', no: '○ Not supported', unknown: '? Unverified' };
+const labels = { yes: '● Supported', partial: '◐ Partial', different: '≈ Different model', no: '○ Not supported', unknown: '? Unverified' };
 const element = (tag, text, className) => {
   const node = document.createElement(tag);
   if (text !== undefined) node.textContent = text;
@@ -17,7 +17,7 @@ async function loadJson(path) {
 }
 function renderFeatures(data) {
   const table = document.querySelector('#features');
-  table.replaceChildren(element('caption', 'Capabilities in the pinned versions. Cells link to each library’s API.'));
+  table.replaceChildren(element('caption', 'Capabilities of the pinned builds. Cells link to supporting APIs or source.'));
   const head = element('thead');
   const headings = element('tr');
   const title = element('th', 'Layout capability');
@@ -51,7 +51,8 @@ function renderFeatures(data) {
     row.append(heading);
     feature.support.forEach((status, index) => {
       const cell = element('td', undefined, status);
-      const source = link(labels[status], data.libraries[index].source);
+      const library = data.libraries[index];
+      const source = link(labels[status], feature.sources?.[library.id] ?? library.source);
       source.title = feature.note;
       source.setAttribute('aria-label', `${feature.name}: ${labels[status]}. ${feature.note}`);
       cell.append(source);

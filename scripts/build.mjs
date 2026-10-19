@@ -7,12 +7,18 @@ assert(features.libraries.length > 0, 'Missing library definitions');
 assert.equal(new Set(features.libraries.map(library => library.id)).size, features.libraries.length);
 for (const library of features.libraries) {
   for (const field of ['url', 'source']) assert.equal(new URL(library[field]).protocol, 'https:');
+  assert.match(library.releaseDate, /^\d{4}-\d{2}-\d{2}$/, `Invalid release date for ${library.id}`);
+  assert.equal(new Date(library.releaseDate).toISOString().slice(0, 10), library.releaseDate);
 }
 for (const feature of features.features) {
   assert.equal(feature.support.length, features.libraries.length, feature.name);
-  assert(feature.support.every(status => ['yes', 'no', 'different', 'unknown'].includes(status)), feature.name);
+  assert(feature.support.every(status => ['yes', 'no', 'partial', 'different', 'unknown'].includes(status)), feature.name);
   assert(feature.support.includes('yes'), `No library supports ${feature.name}`);
   assert(feature.note, `Missing explanation for ${feature.name}`);
+  for (const [libraryId, source] of Object.entries(feature.sources ?? {})) {
+    assert(features.libraries.some(library => library.id === libraryId), `Unknown library ${libraryId}`);
+    assert.equal(new URL(source).protocol, 'https:');
+  }
 }
 execFileSync(process.execPath, ['--check', 'site/app.js'], { stdio: 'inherit' });
 const html = await readFile('site/index.html', 'utf8');
