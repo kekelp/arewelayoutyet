@@ -1,0 +1,91 @@
+name: Daily benchmarks and website
+
+on:
+  schedule:
+    - cron: '23 4 * * *'
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+concurrency:
+  group: benchmark-history-and-pages
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  benchmark:
+    if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: benchmarks
+      - name: Download release history or initialize the first run
+        run: python3 scripts/history.py download
+      - name: Run the shared layout workloads
+        run: cargo bench --manifest-path benchmarks/Cargo.toml --locked --bench pangui --features morphorm,torin -- --noplot
+      - name: Append this run to the full history
+        run: python3 scripts/collect.py
+      - name: Build the static site
+        run: node scripts/build.mjs
+      - name: Stage the archive recovery files
+        run: |
+          mkdir -p .history/backup/site/data .history/backup/.history
+          cp site/data/history.json .history/backup/site/data/
+          if [ -f .history/previous-history.json.gz ]; then
+            cp .history/previous-history.json.gz .history/backup/.history/
+          fi
+      - name: Back up old and new history before replacing the asset
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-history-${{ github.run_id }}-${{ github.run_attempt }}
+          include-hidden-files: true
+          path: .history/backup/
+          retention-days: 90
+          if-no-files-found: error
+      - name: Replace and verify the release archive
+        run: python3 scripts/history.py upload
+      - name: Preserve Criterion estimates and benchmark metadata
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: criterion-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            benchmarks/target/criterion/**/new/estimates.json
+            benchmarks/target/criterion/**/new/benchmark.json
+          retention-days: 30
+          if-no-files-found: ignore
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: benchmark
+    runs-on: ubuntu-24.04
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

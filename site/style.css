@@ -1,0 +1,46 @@
+:root {
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  color: #26362e;
+  background: #f5f5ee;
+  font-synthesis: none;
+  --muted: #647368;
+  --line: #d9dfd3;
+  --accent: #2c6042;
+  --panel: #fafbf6;
+}
+* { box-sizing: border-box; }
+body { margin: 0; }
+.shell { max-width: 1120px; margin: auto; padding: 0 40px; }
+header { display: flex; align-items: center; min-height: 98px; }
+a { color: inherit; text-underline-offset: 4px; }
+.brand { text-decoration: none; font-weight: 700; letter-spacing: -.5px; }
+.logo { display: inline-grid; place-items: center; background: var(--accent); color: #e7edcb; width: 30px; height: 30px; border-radius: 6px; margin-right: 9px; }
+section { padding: 40px 0; }
+p { line-height: 1.7; }
+.small { font-size: 12px; color: var(--muted); }
+footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; padding-bottom: 24px !important; }
+.legend { display: flex; flex-wrap: wrap; gap: 24px; font-size: 12px; margin-bottom: 16px; }
+.yes { color: #306447; }
+.different { color: #88601f; }
+.no, .unknown { color: var(--muted); }
+.table-scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; }
+table { border-collapse: collapse; width: 100%; background: var(--panel); font-size: 13px; }
+caption { text-align: left; padding: 15px; color: var(--muted); font-size: 12px; }
+th, td { padding: 16px 20px; border-top: 1px solid var(--line); text-align: center; min-width: 145px; }
+th:first-child { text-align: left; min-width: 260px; }
+thead th { border-top: 0; padding-top: 24px; padding-bottom: 24px; font-size: 16px; }
+th small { display: block; font-size: 10px; font-weight: 400; margin-top: 7px; color: var(--muted); }
+tbody th { font-weight: 500; }
+td a { text-decoration: none; }
+tbody tr:hover { background: #edf1e6; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+@media (max-width: 680px) {
+  .shell { padding-left: 20px; padding-right: 20px; }
+}
+@media (prefers-color-scheme: dark) {
+  :root { color: #e0e7d9; background: #171f1a; --muted: #a5b39e; --line: #354335; --accent: #adc889; --panel: #1e2920; }
+  .yes { color: #b4ce96; }
+  .different { color: #e0ba70; }
+  tbody tr:hover { background: #293627; }
+  .logo { color: #17251a; }
+}

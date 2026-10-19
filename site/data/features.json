@@ -1,0 +1,22 @@
+{
+  "reviewed": "2026-10-19",
+  "libraries": [
+    {"id": "taffy", "name": "Taffy", "version": "0.15.0 (pinned Git)", "url": "https://github.com/DioxusLabs/taffy", "source": "https://github.com/DioxusLabs/taffy/tree/4e59968eda29ceeb0bbaeb3993c8cd38baa3d0a6/src/style"},
+    {"id": "morphorm", "name": "Morphorm", "version": "0.9.0", "url": "https://github.com/vizia/morphorm", "source": "https://docs.rs/morphorm/0.9.0/morphorm/trait.Node.html"},
+    {"id": "torin", "name": "Torin", "version": "0.5.0-rc.10", "url": "https://github.com/marc2332/freya/tree/main/crates/torin", "source": "https://docs.rs/torin/0.5.0-rc.10/torin/node/struct.Node.html"}
+  ],
+  "features": [
+    {"name": "Horizontal and vertical stacks", "support": ["yes", "yes", "yes"], "note": "Row and column flows. This does not imply CSS flexbox conformance."},
+    {"name": "CSS flexbox", "support": ["yes", "different", "different"], "note": "Morphorm uses stretch units. Torin uses its own flex content and sizing model."},
+    {"name": "CSS grid", "support": ["yes", "different", "no"], "note": "Morphorm exposes grid tracks and spans, not the complete CSS grid model. Torin does not support CSS grid."},
+    {"name": "Wrapping flow", "support": ["yes", "yes", "yes"], "note": "Native flow wrapping, with different sizing semantics between libraries."},
+    {"name": "Fixed and percentage sizes", "support": ["yes", "yes", "yes"], "note": "Explicit sizes and sizes relative to the containing area."},
+    {"name": "Content-based sizing", "support": ["yes", "yes", "yes"], "note": "Size a container from its contents."},
+    {"name": "Minimum and maximum sizes", "support": ["yes", "yes", "yes"], "note": "Lower and upper size constraints."},
+    {"name": "Padding and gaps", "support": ["yes", "yes", "yes"], "note": "Inner spacing and spacing between children."},
+    {"name": "In-flow margins", "support": ["yes", "no", "yes"], "note": "Morphorm's edge spacing applies to absolute nodes, not in-flow margins. Its adapter skips margin templates."},
+    {"name": "Aspect ratio property", "support": ["yes", "yes", "no"], "note": "Torin's adapter skips ratio templates because the benchmarked version has no aspect-ratio property."},
+    {"name": "Custom content measurement", "support": ["yes", "yes", "yes"], "note": "Provide intrinsic sizes externally. These hooks are not built-in text shaping or text measurement engines."},
+    {"name": "CSS block layout", "support": ["yes", "different", "different"], "note": "Morphorm and Torin have stacking layouts rather than CSS block formatting."}
+  ]
+}

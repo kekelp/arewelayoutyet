@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Compare the capabilities of Rust UI layout libraries.">
+  <meta name="color-scheme" content="light dark">
+  <title>Are we layout yet?</title>
+  <link rel="stylesheet" href="style.css">
+  <script type="module" src="app.js"></script>
+</head>
+<body>
+  <header class="shell"><a class="brand" href="./"><span class="logo" aria-hidden="true">▦</span> are we layout yet?</a></header>
+  <main class="shell">
+    <section aria-label="Library capabilities">
+      <div class="legend"><span class="yes">● Supported</span><span class="different">◐ Different model</span><span class="no">○ Not supported</span><span class="unknown">? Unverified</span></div>
+      <div class="table-scroll" tabindex="0" role="region" aria-label="Library feature comparison"><table id="features"><caption>Loading library features…</caption></table></div>
+    </section>
+    <noscript><p>JavaScript is needed to render the comparison. The <a href="data/features.json">feature matrix JSON</a> remains available directly.</p></noscript>
+  </main>
+  <footer class="shell small"><span>Generated on <time datetime="{{generated-at}}">{{generated-date}}</time> (UTC)</span><a href="https://github.com/marc2332/arewelayoutyet">Source on GitHub</a></footer>
+</body>
+</html>

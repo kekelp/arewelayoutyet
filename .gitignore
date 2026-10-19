@@ -1,0 +1,13 @@
+/benchmarks/target/
+/dist/
+/.history/
+__pycache__/
+/site/data/history.json
+.bash*
+.zsh*
+.zprofile
+.profile
+.env
+.gitconfig
+.mcp.json
+.ripgreprc
