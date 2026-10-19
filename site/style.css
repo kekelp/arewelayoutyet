@@ -45,6 +45,15 @@ section[aria-labelledby="benchmark-heading"] { padding: 20px 0; }
 #benchmark-results th small { margin-top: 3px; }
 #benchmark-results td { font-variant-numeric: tabular-nums; }
 #benchmark-results td small { display: block; margin-top: 2px; font-size: 10px; color: var(--muted); }
+.benchmark-overview { margin: 24px 0 0; }
+.heatmap-legend { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 12px 0; }
+.heatmap-controls { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 12px 0; font-size: 12px; color: var(--muted); }
+.heatmap-controls button { min-height: 44px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 4px; background: var(--panel); color: inherit; font: inherit; cursor: pointer; }
+.heatmap-controls button:disabled { opacity: .4; cursor: default; }
+.heatmap-controls span { text-align: center; }
+.heatmap-scale { width: 100px; height: 10px; border-radius: 3px; background: linear-gradient(to right, #1d573b, #303030, #713737); }
+.benchmark-chart { overflow: hidden; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); }
+.benchmark-chart svg { display: block; width: 100%; height: auto; font-variant-numeric: tabular-nums; }
 .benchmark-heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
 .benchmark-heading h2 { margin: 0; font-size: 20px; }
 .benchmark-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; }

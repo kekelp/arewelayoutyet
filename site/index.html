@@ -26,6 +26,16 @@
       <div id="benchmark-content" hidden>
         <label class="run-selector">Run <select id="benchmark-run"></select></label>
         <div class="table-scroll" tabindex="0" role="region" aria-label="Layout benchmark results"><table id="benchmark-results"></table></div>
+        <figure class="benchmark-overview">
+          <figcaption class="small">Mean layout time. Color compares libraries within each benchmark, not across workloads.</figcaption>
+          <div class="heatmap-legend small"><span>Fastest</span><span class="heatmap-scale" aria-hidden="true"></span><span>Slowest</span><span>/ = no measurement</span></div>
+          <div id="heatmap-controls" class="heatmap-controls" hidden>
+            <button id="heatmap-previous" type="button" aria-controls="benchmark-chart" aria-label="Previous benchmarks">Previous</button>
+            <span id="heatmap-page" aria-live="polite"></span>
+            <button id="heatmap-next" type="button" aria-controls="benchmark-chart" aria-label="Next benchmarks">Next</button>
+          </div>
+          <div id="benchmark-chart" class="benchmark-chart" role="region" aria-label="Benchmark heatmap"></div>
+        </figure>
         <p id="run-details" class="small"></p>
       </div>
     </section>

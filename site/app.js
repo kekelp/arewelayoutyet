@@ -108,6 +108,67 @@ function formatTime(nanoseconds) {
   if (nanoseconds >= 1e3) return `${(nanoseconds / 1e3).toFixed(2)} µs`;
   return `${nanoseconds.toFixed(1)} ns`;
 }
+function renderBenchmarkChart(run, libraries, scenarios) {
+  const namespace = 'http://www.w3.org/2000/svg';
+  const svgElement = (tag, attributes = {}, text) => {
+    const node = document.createElementNS(namespace, tag);
+    for (const [name, value] of Object.entries(attributes)) node.setAttribute(name, value);
+    if (text !== undefined) node.textContent = text;
+    return node;
+  };
+  const left = 150;
+  const top = 34;
+  const columnWidth = 72;
+  const rowHeight = 32;
+  const cellWidth = columnWidth - 4;
+  const cellHeight = rowHeight - 4;
+  const width = left + scenarios.length * columnWidth + 12;
+  const labelsHeight = Math.max(0, ...scenarios.map(scenario => scenario.length)) * 4.5 + 20;
+  const height = top + libraries.length * rowHeight + labelsHeight;
+  const svg = svgElement('svg', { width, height, viewBox: `0 0 ${width} ${height}`, role: 'img', 'aria-labelledby': 'heatmap-title heatmap-description' });
+  svg.append(
+    svgElement('title', { id: 'heatmap-title' }, 'Layout benchmark heatmap'),
+    svgElement('desc', { id: 'heatmap-description' }, 'Benchmarks on the X axis, libraries on the Y axis. Cells show mean layout times. Green is fastest and red is slowest within each benchmark. Exact values and confidence intervals are also available in the results table.'),
+    svgElement('text', { x: left - 12, y: 22, 'text-anchor': 'end', fill: '#a1a1aa', 'font-size': 11 }, 'Libraries'),
+    svgElement('text', { x: left + scenarios.length * columnWidth / 2, y: 22, 'text-anchor': 'middle', fill: '#a1a1aa', 'font-size': 11 }, 'Benchmarks'),
+  );
+  libraries.forEach((library, index) => {
+    svg.append(svgElement('text', { x: left - 12, y: top + index * rowHeight + 18, 'text-anchor': 'end', fill: '#e4e4e7', 'font-size': 12 }, library.name));
+  });
+  scenarios.forEach((scenario, columnIndex) => {
+    const results = run.results.filter(result => result.scenario === scenario && libraries.some(library => library.id === result.library));
+    const minimum = Math.min(...results.map(result => result.mean_ns));
+    const maximum = Math.max(...results.map(result => result.mean_ns));
+    const positionX = left + columnIndex * columnWidth;
+    svg.append(svgElement('text', {
+      transform: `translate(${positionX + cellWidth / 2}, ${top + libraries.length * rowHeight + 8}) rotate(-45)`,
+      'text-anchor': 'end', fill: '#a1a1aa', 'font-size': 11,
+    }, scenario.replaceAll('_', ' ')));
+    libraries.forEach((library, rowIndex) => {
+      const result = results.find(result => result.library === library.id);
+      const positionY = top + rowIndex * rowHeight;
+      let fill = '#222';
+      if (result) {
+        const relative = maximum === minimum ? 0 : (result.mean_ns - minimum) / (maximum - minimum);
+        const start = relative <= 0.5 ? [29, 87, 59] : [48, 48, 48];
+        const end = relative <= 0.5 ? [48, 48, 48] : [113, 55, 55];
+        const progress = relative <= 0.5 ? relative * 2 : (relative - 0.5) * 2;
+        fill = `rgb(${start.map((channel, index) => Math.round(channel + (end[index] - channel) * progress)).join(',')})`;
+      }
+      const cell = svgElement('g');
+      const description = result
+        ? `${library.name}, ${scenario.replaceAll('_', ' ')}: ${formatTime(result.mean_ns)} mean, 95% confidence interval ${formatTime(result.lower_ns)} to ${formatTime(result.upper_ns)}`
+        : `${library.name}, ${scenario.replaceAll('_', ' ')}: ${run.versions[library.id] ? 'not supported by adapter' : 'not measured in this run'}`;
+      cell.append(
+        svgElement('title', {}, description),
+        svgElement('rect', { x: positionX, y: positionY, width: cellWidth, height: cellHeight, rx: 3, fill }),
+        svgElement('text', { x: positionX + cellWidth / 2, y: positionY + 18, 'text-anchor': 'middle', fill: result ? '#f4f4f5' : '#a1a1aa', 'font-size': 11 }, result ? formatTime(result.mean_ns) : '/'),
+      );
+      svg.append(cell);
+    });
+  });
+  document.querySelector('#benchmark-chart').replaceChildren(svg);
+}
 function renderBenchmarks(history, libraries) {
   if (history.schema !== 1 || !Array.isArray(history.runs)) throw new Error('Unsupported history format');
   const runs = [...history.runs].sort((first, second) => second.date.localeCompare(first.date));
@@ -124,6 +185,35 @@ function renderBenchmarks(history, libraries) {
     select.append(option);
   });
   select.value = '0';
+  const chart = document.querySelector('#benchmark-chart');
+  const chartControls = document.querySelector('#heatmap-controls');
+  const previous = document.querySelector('#heatmap-previous');
+  const next = document.querySelector('#heatmap-next');
+  let chartPage = 0;
+  const renderChart = () => {
+    const run = runs[Number(select.value)];
+    const scenarios = [...new Set(run.results.map(result => result.scenario))].sort();
+    const availableWidth = chart.clientWidth;
+    const labelWidth = 150;
+    const rightPadding = 12;
+    const columnWidth = 72;
+    const pageSize = availableWidth < 680
+      ? Math.max(1, Math.floor((availableWidth - labelWidth - rightPadding) / columnWidth))
+      : scenarios.length;
+    const pageCount = Math.ceil(scenarios.length / pageSize);
+    chartPage = Math.min(chartPage, Math.max(0, pageCount - 1));
+    const start = chartPage * pageSize;
+    const end = Math.min(start + pageSize, scenarios.length);
+    chartControls.hidden = pageCount <= 1;
+    previous.disabled = chartPage === 0;
+    next.disabled = chartPage >= pageCount - 1;
+    document.querySelector('#heatmap-page').textContent = `Benchmarks ${start + 1}-${end} of ${scenarios.length}`;
+    renderBenchmarkChart(run, libraries, scenarios.slice(start, end));
+  };
+  previous.addEventListener('click', () => { chartPage -= 1; renderChart(); });
+  next.addEventListener('click', () => { chartPage += 1; renderChart(); });
+  const chartObserver = new ResizeObserver(renderChart);
+  chartObserver.observe(chart);
   const render = () => {
     const run = runs[Number(select.value)];
     const table = document.querySelector('#benchmark-results');
@@ -142,6 +232,8 @@ function renderBenchmarks(history, libraries) {
     head.append(headings);
     const body = element('tbody');
     const scenarios = [...new Set(run.results.map(result => result.scenario))].sort();
+    chartPage = 0;
+    renderChart();
     for (const scenario of scenarios) {
       const results = run.results.filter(result => result.scenario === scenario && libraries.some(library => library.id === result.library));
       const fastestMean = Math.min(...results.map(result => result.mean_ns));
@@ -179,8 +271,8 @@ function renderBenchmarks(history, libraries) {
     status.textContent = `${runs.length} recorded ${runs.length === 1 ? 'run' : 'runs'}. Missing results are not zero time.`;
   };
   select.addEventListener('change', render);
-  render();
   document.querySelector('#benchmark-content').hidden = false;
+  render();
 }
 async function main() {
   let features;
