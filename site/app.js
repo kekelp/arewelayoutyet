@@ -11,7 +11,7 @@ const link = (text, url) => {
   return node;
 };
 async function loadJson(path) {
-  const response = await fetch(path);
+  const response = await fetch(path, { cache: 'no-cache' });
   if (!response.ok) throw new Error(`Could not load ${path} (${response.status})`);
   return response.json();
 }
@@ -129,7 +129,7 @@ async function main() {
     document.querySelector('#features caption').textContent = `Feature data unavailable. ${error.message}`;
   }
   try {
-    const response = await fetch('data/history.json');
+    const response = await fetch('data/history.json', { cache: 'no-cache' });
     if (response.status === 404) {
       document.querySelector('#benchmark-status').textContent = 'No measurements published yet. Run just fetch-data for local builds, or check the publishing workflow.';
       return;
