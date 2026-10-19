@@ -126,6 +126,7 @@ function renderBenchmarkChart(run, libraries, scenarios) {
   const labelsHeight = Math.max(0, ...scenarios.map(scenario => scenario.length)) * 4.5 + 20;
   const height = top + libraries.length * rowHeight + labelsHeight;
   const svg = svgElement('svg', { width, height, viewBox: `0 0 ${width} ${height}`, role: 'img', 'aria-labelledby': 'heatmap-title heatmap-description' });
+  svg.style.setProperty('--heatmap-width', `${width}px`);
   svg.append(
     svgElement('title', { id: 'heatmap-title' }, 'Layout benchmark heatmap'),
     svgElement('desc', { id: 'heatmap-description' }, 'Benchmarks on the X axis, libraries on the Y axis. Cells show mean layout times. Green is fastest and red is slowest within each benchmark. Exact values and confidence intervals are also available in the results table.'),
@@ -185,35 +186,6 @@ function renderBenchmarks(history, libraries) {
     select.append(option);
   });
   select.value = '0';
-  const chart = document.querySelector('#benchmark-chart');
-  const chartControls = document.querySelector('#heatmap-controls');
-  const previous = document.querySelector('#heatmap-previous');
-  const next = document.querySelector('#heatmap-next');
-  let chartPage = 0;
-  const renderChart = () => {
-    const run = runs[Number(select.value)];
-    const scenarios = [...new Set(run.results.map(result => result.scenario))].sort();
-    const availableWidth = chart.clientWidth;
-    const labelWidth = 150;
-    const rightPadding = 12;
-    const columnWidth = 72;
-    const pageSize = availableWidth < 680
-      ? Math.max(1, Math.floor((availableWidth - labelWidth - rightPadding) / columnWidth))
-      : scenarios.length;
-    const pageCount = Math.ceil(scenarios.length / pageSize);
-    chartPage = Math.min(chartPage, Math.max(0, pageCount - 1));
-    const start = chartPage * pageSize;
-    const end = Math.min(start + pageSize, scenarios.length);
-    chartControls.hidden = pageCount <= 1;
-    previous.disabled = chartPage === 0;
-    next.disabled = chartPage >= pageCount - 1;
-    document.querySelector('#heatmap-page').textContent = `Benchmarks ${start + 1}-${end} of ${scenarios.length}`;
-    renderBenchmarkChart(run, libraries, scenarios.slice(start, end));
-  };
-  previous.addEventListener('click', () => { chartPage -= 1; renderChart(); });
-  next.addEventListener('click', () => { chartPage += 1; renderChart(); });
-  const chartObserver = new ResizeObserver(renderChart);
-  chartObserver.observe(chart);
   const render = () => {
     const run = runs[Number(select.value)];
     const table = document.querySelector('#benchmark-results');
@@ -232,8 +204,7 @@ function renderBenchmarks(history, libraries) {
     head.append(headings);
     const body = element('tbody');
     const scenarios = [...new Set(run.results.map(result => result.scenario))].sort();
-    chartPage = 0;
-    renderChart();
+    renderBenchmarkChart(run, libraries, scenarios);
     for (const scenario of scenarios) {
       const results = run.results.filter(result => result.scenario === scenario && libraries.some(library => library.id === result.library));
       const fastestMean = Math.min(...results.map(result => result.mean_ns));
