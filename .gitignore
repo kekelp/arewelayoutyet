@@ -1,6 +1,7 @@
 /benchmarks/target/
 /dist/
 /.history/
+/.vercel/
 /site/data/history.json
 .bash*
 .zsh*
