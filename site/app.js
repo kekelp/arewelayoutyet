@@ -81,7 +81,7 @@ function renderBenchmarks(history, libraries) {
     for (const library of libraries) {
       const heading = element('th');
       heading.scope = 'col';
-      heading.append(link(library.name, library.url), element('small', run.versions[library.id] ?? library.version));
+      heading.append(link(library.name, library.url), element('small', run.versions[library.id] ?? 'Not measured'));
       headings.append(heading);
     }
     head.append(headings);
@@ -102,7 +102,9 @@ function renderBenchmarks(history, libraries) {
           if (result.mean_ns === fastestMean) mean.title = 'Lowest mean time in this row';
           cell.append(mean, element('small', `${formatTime(result.lower_ns)} to ${formatTime(result.upper_ns)}`));
         } else {
-          cell.append(element('span', '/', 'small'));
+          const missing = element('span', '/', 'small');
+          missing.title = run.versions[library.id] ? 'Not supported by adapter' : 'Not benchmarked in this run';
+          cell.append(missing);
         }
         row.append(cell);
       }
