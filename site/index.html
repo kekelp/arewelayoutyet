@@ -14,6 +14,10 @@
   <header class="shell"><a class="brand" href="./"><span class="logo" aria-hidden="true">📐</span> are we layout yet?</a></header>
   <main class="shell">
     <p class="small">A comparison of active, in-development, feature-rich UI layout libraries for Rust 🦀.</p>
+    <section aria-label="Library capabilities">
+      <div class="legend"><span class="yes">● Supported</span><span class="partial">◐ Partial</span><span class="different">≈ Different model</span><span class="no">○ Not supported</span><span class="unknown">? Unverified</span></div>
+      <div class="table-scroll" tabindex="0" role="region" aria-label="Library feature comparison"><table id="features"><caption>Loading library features…</caption></table></div>
+    </section>
     <section aria-labelledby="benchmark-heading">
       <div class="benchmark-heading">
         <h2 id="benchmark-heading">Benchmarks</h2>
@@ -25,19 +29,18 @@
       </div>
       <p id="benchmark-status" class="small" role="status">Loading measurements…</p>
       <div id="benchmark-content" hidden>
-        <label class="run-selector">Run <select id="benchmark-run"></select></label>
+        <div class="run-toolbar">
+          <label class="run-selector">Run <select id="benchmark-run"></select></label>
+          <p id="run-details" class="small"></p>
+        </div>
         <div class="table-scroll" tabindex="0" role="region" aria-label="Layout benchmark results"><table id="benchmark-results"></table></div>
         <figure class="benchmark-overview">
-          <figcaption class="small">Mean layout time. Color compares libraries within each benchmark, not across workloads.</figcaption>
-          <div class="heatmap-legend small"><span>Fastest</span><span class="heatmap-scale" aria-hidden="true"></span><span>Slowest</span><span>/ = no measurement</span></div>
-          <div id="benchmark-chart" class="benchmark-chart" tabindex="0" role="region" aria-label="Benchmark heatmap, scroll horizontally on mobile"></div>
+          <figcaption id="benchmark-chart-caption" class="small" aria-live="polite">Further left is faster. The fastest visible mean per benchmark is 1×. Dots and 95% confidence bounds are divided by that fastest visible mean. The X axis is logarithmic. Missing results have no dot.</figcaption>
+          <label class="chart-mode small"><input id="benchmark-chart-milliseconds" type="checkbox" aria-controls="benchmark-chart"> Show milliseconds (log scale)</label>
+          <div id="benchmark-chart-legend" class="chart-legend" role="group" aria-label="Chart libraries, hover to highlight or click to toggle"></div>
+          <div id="benchmark-chart" class="benchmark-chart" tabindex="0" role="region" aria-label="Benchmark dot plots, scroll horizontally on mobile"></div>
         </figure>
-        <p id="run-details" class="small"></p>
       </div>
-    </section>
-    <section aria-label="Library capabilities">
-      <div class="legend"><span class="yes">● Supported</span><span class="partial">◐ Partial</span><span class="different">≈ Different model</span><span class="no">○ Not supported</span><span class="unknown">? Unverified</span></div>
-      <div class="table-scroll" tabindex="0" role="region" aria-label="Library feature comparison"><table id="features"><caption>Loading library features…</caption></table></div>
     </section>
     <noscript><p>JavaScript is needed to render the comparison. The <a href="data/features.json">feature matrix JSON</a> remains available directly.</p></noscript>
   </main>
