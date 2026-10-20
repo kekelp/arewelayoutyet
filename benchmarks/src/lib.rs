@@ -26,6 +26,9 @@ pub mod ui_layout_helpers;
 #[cfg(feature = "clay")]
 pub mod clay_helpers;
 
+#[cfg(feature = "ply")]
+pub mod ply_helpers;
+
 use criterion::measurement::WallTime;
 use criterion::{Bencher, BenchmarkGroup, Criterion, SamplingMode};
 use rand::distr::uniform::SampleRange;

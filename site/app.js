@@ -135,7 +135,7 @@ function renderBenchmarkChart(run, libraries, scenarios, hiddenLibraries) {
   const width = 1120;
   const right = width - 32;
   const laneHeight = 16;
-  const colors = ['#60a5fa', '#c084fc', '#34d399', '#fb923c', '#fb7185', '#facc15'];
+  const colors = ['#60a5fa', '#c084fc', '#34d399', '#fb923c', '#fb7185', '#facc15', '#22d3ee'];
   const visibleLibraries = libraries.filter(library => !hiddenLibraries.has(library.id));
   const measurements = scenarios.map(scenario => {
     const nodeCount = run.node_counts?.[scenario];
@@ -315,7 +315,8 @@ function renderBenchmarks(history, libraries) {
   const render = () => {
     const run = runs[Number(select.value)];
     const table = document.querySelector('#benchmark-results');
-    const timingNote = run.versions['clay-layout'] ? ' Clay includes its native element declaration and render-command generation.' : '';
+    const frameLibraries = libraries.filter(library => ['clay-layout', 'ply-engine'].includes(library.id) && run.versions[library.id]).map(library => library.name);
+    const timingNote = frameLibraries.length ? ` ${frameLibraries.join(' and ')} timings include native element declaration and render-command generation.` : '';
     table.replaceChildren(element('caption', `Mean layout time, lower is faster. Ranges are 95% confidence intervals. Uncached layout, adapters can differ in semantics.${timingNote}`));
     const head = element('thead');
     const headings = element('tr');

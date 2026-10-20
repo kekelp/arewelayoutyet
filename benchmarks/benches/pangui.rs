@@ -20,6 +20,8 @@ use taffy_benchmarks::clay_helpers::ClayTree;
 use taffy_benchmarks::morphorm_helpers::MorphormTree;
 #[cfg(feature = "taffy03")]
 use taffy_benchmarks::taffy_03_helpers::Taffy03TreeBuilder;
+#[cfg(feature = "ply")]
+use taffy_benchmarks::ply_helpers::PlyTree;
 #[cfg(feature = "torin")]
 use taffy_benchmarks::torin_helpers::TorinTree;
 #[cfg(feature = "ui-layout")]
@@ -208,6 +210,13 @@ fn benchmark_native_libraries(group: &mut BenchmarkGroup<WallTime>, name: &str, 
     #[cfg(feature = "clay")]
     if let Some(mut tree) = ClayTree::new(root, width, height) {
         group.bench_function(BenchmarkId::new(name, "Clay"), |b| {
+            taffy_benchmarks::iter_timed(b, || tree.layout_duration())
+        });
+    }
+
+    #[cfg(feature = "ply")]
+    if let Some(mut tree) = PlyTree::new(root, width, height) {
+        group.bench_function(BenchmarkId::new(name, "Ply"), |b| {
             taffy_benchmarks::iter_timed(b, || tree.layout_duration())
         });
     }
