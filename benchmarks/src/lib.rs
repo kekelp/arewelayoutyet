@@ -29,6 +29,9 @@ pub mod clay_helpers;
 #[cfg(feature = "ply")]
 pub mod ply_helpers;
 
+#[cfg(feature = "backer")]
+pub mod backer_helpers;
+
 use criterion::measurement::WallTime;
 use criterion::{Bencher, BenchmarkGroup, Criterion, SamplingMode};
 use rand::distr::uniform::SampleRange;

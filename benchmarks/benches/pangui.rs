@@ -14,6 +14,8 @@ use taffy_benchmarks::pangui_template::{
 };
 use taffy_benchmarks::{bench_layout, benchmark_group, BuildTree, BuildTreeExt, GenStyle, TaffyTreeBuilder};
 
+#[cfg(feature = "backer")]
+use taffy_benchmarks::backer_helpers::BackerTree;
 #[cfg(feature = "clay")]
 use taffy_benchmarks::clay_helpers::ClayTree;
 #[cfg(feature = "morphorm")]
@@ -206,6 +208,14 @@ macro_rules! benchmark_each_library {
 #[allow(unused_variables)]
 fn benchmark_native_libraries(group: &mut BenchmarkGroup<WallTime>, name: &str, root: &LayoutNode) {
     let (width, height) = (root_size(&root.width), root_size(&root.height));
+
+    #[cfg(feature = "backer")]
+    if let Some(tree) = BackerTree::new(root, width, height) {
+        let mut tree = Some(tree);
+        group.bench_function(BenchmarkId::new(name, "Backer"), |b| {
+            bench_layout(b, &mut tree, || unreachable!(), |tree| tree.mark_all_dirty(), |tree| tree.compute_layout())
+        });
+    }
 
     #[cfg(feature = "clay")]
     if let Some(mut tree) = ClayTree::new(root, width, height) {

@@ -48,6 +48,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f2032f911046de80f0a198e0901378627c33f59ea0ac00e363d481118bd70a53"
 
 [[package]]
+name = "backer"
+version = "0.12.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "aadfa7734dcad364c220eccaae7b9f1a12849bcbce81c7eb4cdf63faaaae08ba"
+
+[[package]]
 name = "bindgen"
 version = "0.71.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -975,6 +981,7 @@ dependencies = [
 name = "taffy_benchmarks"
 version = "0.1.0"
 dependencies = [
+ "backer",
  "clay-layout",
  "criterion",
  "morphorm",

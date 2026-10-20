@@ -135,7 +135,7 @@ function renderBenchmarkChart(run, libraries, scenarios, hiddenLibraries) {
   const width = 1120;
   const right = width - 32;
   const laneHeight = 16;
-  const colors = ['#60a5fa', '#c084fc', '#34d399', '#fb923c', '#fb7185', '#facc15', '#22d3ee'];
+  const colors = { taffy: '#60a5fa', morphorm: '#c084fc', torin: '#34d399', yoga: '#fb923c', ui_layout: '#fb7185', 'clay-layout': '#facc15', 'ply-engine': '#22d3ee', backer: '#e2e8f0' };
   const visibleLibraries = libraries.filter(library => !hiddenLibraries.has(library.id));
   const measurements = scenarios.map(scenario => {
     const nodeCount = run.node_counts?.[scenario];
@@ -222,7 +222,7 @@ function renderBenchmarkChart(run, libraries, scenarios, hiddenLibraries) {
     for (const { id, group } of seriesGroups) group.style.opacity = selected === null || id === selected ? '1' : '0.15';
   };
   libraries.forEach((library, libraryIndex) => {
-    const color = colors[libraryIndex % colors.length];
+    const color = colors[library.id] ?? '#d4d4d8';
     const group = svgElement('g', { class: 'chart-series' });
     group.style.display = hiddenLibraries.has(library.id) ? 'none' : '';
     seriesGroups.push({ id: library.id, group });
