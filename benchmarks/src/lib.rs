@@ -23,6 +23,9 @@ pub mod torin_helpers;
 #[cfg(feature = "ui-layout")]
 pub mod ui_layout_helpers;
 
+#[cfg(feature = "clay")]
+pub mod clay_helpers;
+
 use criterion::measurement::WallTime;
 use criterion::{Bencher, BenchmarkGroup, Criterion, SamplingMode};
 use rand::distr::uniform::SampleRange;

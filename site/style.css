@@ -11,7 +11,7 @@
 }
 * { box-sizing: border-box; }
 body { margin: 0; }
-.shell { max-width: 1120px; margin: auto; padding: 0 40px; }
+.shell { max-width: 1200px; margin: auto; padding: 0 24px; }
 header { display: flex; align-items: center; min-height: 98px; }
 a { color: inherit; text-underline-offset: 4px; }
 .brand { text-decoration: none; font-weight: 700; letter-spacing: -.5px; }

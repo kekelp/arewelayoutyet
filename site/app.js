@@ -189,7 +189,8 @@ function renderBenchmarks(history, libraries) {
   const render = () => {
     const run = runs[Number(select.value)];
     const table = document.querySelector('#benchmark-results');
-    table.replaceChildren(element('caption', 'Mean layout time, lower is faster. Ranges are 95% confidence intervals. Uncached layout only, adapters can differ in semantics.'));
+    const timingNote = run.versions['clay-layout'] ? ' Clay includes its native element declaration and render-command generation.' : '';
+    table.replaceChildren(element('caption', `Mean layout time, lower is faster. Ranges are 95% confidence intervals. Uncached layout, adapters can differ in semantics.${timingNote}`));
     const head = element('thead');
     const headings = element('tr');
     const workloadHeading = element('th', 'Workload');
