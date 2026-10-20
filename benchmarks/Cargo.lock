@@ -738,6 +738,7 @@ dependencies = [
  "ordered-float",
  "rand",
  "rand_chacha",
+ "serde_json",
  "slotmap",
  "taffy 0.15.0",
  "taffy 0.3.19",

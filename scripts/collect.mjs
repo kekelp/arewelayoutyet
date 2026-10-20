@@ -48,12 +48,21 @@ const versions = Object.fromEntries(metadata.packages
 for (const library of libraries.values()) {
   if (!versions[library]) throw new Error(`Missing resolved version for ${library}`);
 }
+const nodeCounts = JSON.parse(execFileSync('cargo', [
+  'run', '--quiet', '--locked', '--manifest-path', 'benchmarks/Cargo.toml', '--bin', 'workload_nodes',
+], { encoding: 'utf8' }));
+for (const scenario of scenarios) {
+  if (!Number.isSafeInteger(nodeCounts[scenario]) || nodeCounts[scenario] <= 0) {
+    throw new Error(`Missing or invalid node count for ${scenario}`);
+  }
+}
 const date = new Date().toISOString();
 const run = {
   id: process.env.GITHUB_RUN_ID || date,
   date,
   commit: execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(),
   upstream,
+  node_counts: nodeCounts,
   versions,
   cpu: cpus()[0]?.model || process.arch,
   runner: process.env.RUNNER_OS || platform(),
@@ -66,4 +75,13 @@ const run = {
 const history = await readHistory(values.history, true);
 history.runs = [...history.runs.filter(entry => entry.id !== run.id), run]
   .sort((first, second) => Date.parse(first.date) - Date.parse(second.date));
+for (const entry of history.runs) {
+  if (entry.upstream !== upstream) continue;
+  entry.node_counts ??= {};
+  for (const result of entry.results) {
+    if (Number.isSafeInteger(nodeCounts[result.scenario])) {
+      entry.node_counts[result.scenario] ??= nodeCounts[result.scenario];
+    }
+  }
+}
 await writeHistory(values.history, history);

@@ -17,6 +17,8 @@ A comparison of Rust UI layout libraries:
 
 **Performance:** daily benchmarks of shared PanGUI workloads, adapted from Taffy's benchmark suite. Results include mean layout times, confidence intervals, and historical runs. Retained-tree engines time uncached layout computation without tree construction. Clay times its full native pass, including element declaration and render-command generation, because intrinsic sizing occurs during declaration. No commands are consumed or drawn.
 
+The graph offers relative time, total milliseconds, and average nanoseconds per workload node. Per-node values divide the mean and confidence bounds by the expanded template node count, including the root, rather than engine-specific internal nodes. This does not make different tree shapes or layout features equivalent.
+
 The engines have different layout semantics. Missing results (`/`) mean the adapter cannot translate that workload or the library was not included in that historical run. Timings do not establish equivalent output or an overall winner.
 
 Text measurement is not currently compared. See [benchmark provenance](benchmarks/UPSTREAM.md) for attribution and adapter details.

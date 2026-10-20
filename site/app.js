@@ -109,12 +109,20 @@ function formatTime(nanoseconds) {
   return `${nanoseconds.toFixed(1)} ns`;
 }
 function renderBenchmarkChart(run, libraries, scenarios, hiddenLibraries) {
-  const milliseconds = document.querySelector('#benchmark-chart-milliseconds').checked;
-  const formatMilliseconds = value => `${Number(value.toPrecision(4))} ms`;
-  const formatChartTime = nanoseconds => milliseconds ? formatMilliseconds(nanoseconds / 1e6) : formatTime(nanoseconds);
-  document.querySelector('#benchmark-chart-caption').textContent = milliseconds
-    ? 'Further left is faster. Dots show mean time in milliseconds, with 95% confidence-interval whiskers. The X axis is logarithmic. Missing results have no dot.'
-    : 'Further left is faster. The fastest visible mean per benchmark is 1×. Dots and 95% confidence bounds are divided by that fastest visible mean. The X axis is logarithmic. Missing results have no dot.';
+  const mode = document.querySelector('#benchmark-chart-mode').value;
+  const relativeMode = mode === 'relative';
+  const milliseconds = mode === 'milliseconds';
+  const perNode = mode === 'per-node';
+  const formatAbsolute = value => `${Number(value.toPrecision(4))} ${perNode ? 'ns/node' : 'ms'}`;
+  const formatChartTime = nanoseconds => milliseconds ? formatAbsolute(nanoseconds / 1e6) : formatTime(nanoseconds);
+  const hasNodeCount = scenario => Number.isSafeInteger(run.node_counts?.[scenario]) && run.node_counts[scenario] > 0;
+  const captions = {
+    relative: 'Further left is faster. The fastest visible mean per benchmark is 1×. Dots and 95% confidence bounds are divided by that fastest visible mean. The X axis is logarithmic. Missing results have no dot.',
+    milliseconds: 'Further left is faster. Dots show mean time in milliseconds, with 95% confidence-interval whiskers. The X axis is logarithmic. Missing results have no dot.',
+    'per-node': 'Further left is faster. Mean times and 95% confidence bounds are divided by the workload node count, including the root, and shown in ns/node. The X axis is logarithmic. This is average cost, not an individual node timing. Missing results have no dot.',
+  };
+  const missingCounts = perNode && scenarios.some(scenario => !hasNodeCount(scenario));
+  document.querySelector('#benchmark-chart-caption').textContent = captions[mode] + (missingCounts ? ' Workloads without recorded node counts are omitted.' : '');
   const namespace = 'http://www.w3.org/2000/svg';
   const svgElement = (tag, attributes = {}, text) => {
     const node = document.createElementNS(namespace, tag);
@@ -130,16 +138,16 @@ function renderBenchmarkChart(run, libraries, scenarios, hiddenLibraries) {
   const colors = ['#60a5fa', '#c084fc', '#34d399', '#fb923c', '#fb7185', '#facc15'];
   const visibleLibraries = libraries.filter(library => !hiddenLibraries.has(library.id));
   const measurements = scenarios.map(scenario => {
-    const results = run.results.filter(result => result.scenario === scenario && visibleLibraries.some(library => library.id === result.library));
-    return { results, fastest: Math.min(...results.map(result => result.mean_ns)) };
+    const nodeCount = run.node_counts?.[scenario];
+    const results = run.results.filter(result => result.scenario === scenario && visibleLibraries.some(library => library.id === result.library) && (!perNode || hasNodeCount(scenario)));
+    const fastest = Math.min(...results.map(result => result.mean_ns));
+    const divisor = perNode ? nodeCount : milliseconds ? 1e6 : fastest;
+    return { results, fastest, nodeCount, divisor };
   });
-  const values = measurements.flatMap(({ results, fastest }) => results.flatMap(result => {
-    const divisor = milliseconds ? 1e6 : fastest;
-    return [result.lower_ns / divisor, result.upper_ns / divisor];
-  }));
+  const values = measurements.flatMap(({ results, divisor }) => results.flatMap(result => [result.lower_ns / divisor, result.upper_ns / divisor]));
   const minimum = values.length ? Math.min(...values) : 1;
-  const firstTick = milliseconds ? 10 ** Math.floor(Math.log10(minimum)) : 1;
-  const axisMinimum = milliseconds ? firstTick : Math.min(1, minimum) * 0.98;
+  const firstTick = relativeMode ? 1 : 10 ** Math.floor(Math.log10(minimum));
+  const axisMinimum = relativeMode ? Math.min(1, minimum) * 0.98 : firstTick;
   const maximum = Math.max(firstTick * 2, ...values);
   const ticks = [firstTick];
   for (let magnitude = firstTick; ticks.at(-1) < maximum; magnitude *= 10) {
@@ -150,8 +158,7 @@ function renderBenchmarkChart(run, libraries, scenarios, hiddenLibraries) {
   }
   const positionX = value => left + Math.log(value / axisMinimum) / Math.log(ticks.at(-1) / axisMinimum) * (right - left);
   let bottom = top;
-  const rows = measurements.map(({ results, fastest }) => {
-    const divisor = milliseconds ? 1e6 : fastest;
+  const rows = measurements.map(({ results, divisor }) => {
     const points = visibleLibraries.flatMap(library => {
       const result = results.find(result => result.library === library.id);
       if (!result) return [];
@@ -180,12 +187,12 @@ function renderBenchmarkChart(run, libraries, scenarios, hiddenLibraries) {
     return row;
   });
   const height = bottom + 56;
-  const axisLabel = milliseconds ? 'Mean time in milliseconds (log scale), faster to the left' : 'Relative mean time (log scale), faster to the left';
+  const axisLabel = perNode ? 'Average time per node (ns/node, log scale), faster to the left' : milliseconds ? 'Mean time in milliseconds (log scale), faster to the left' : 'Relative mean time (log scale), faster to the left';
   const svg = svgElement('svg', { width, height, viewBox: `0 0 ${width} ${height}`, role: 'img', 'aria-labelledby': 'chart-title chart-description' });
   svg.style.setProperty('--chart-width', `${width}px`);
   svg.append(
-    svgElement('title', { id: 'chart-title' }, milliseconds ? 'Layout benchmark dot plots in milliseconds' : 'Relative layout benchmark dot plots'),
-    svgElement('desc', { id: 'chart-description' }, `Each benchmark has its own row. Labeled colored dots show library means, sharing lanes when their labels and confidence intervals do not overlap. Further left is faster. Whiskers show each mean's 95% confidence bounds. ${milliseconds ? 'The logarithmic X axis shows milliseconds.' : 'The logarithmic X axis shows times and confidence bounds divided by the fastest visible measured mean in each benchmark. The fastest mean is 1×.'} Missing results have no dot. Exact times and confidence intervals are also available in the results table.`),
+    svgElement('title', { id: 'chart-title' }, perNode ? 'Per-node layout benchmark dot plots' : milliseconds ? 'Layout benchmark dot plots in milliseconds' : 'Relative layout benchmark dot plots'),
+    svgElement('desc', { id: 'chart-description' }, `Each benchmark has its own row. Labeled colored dots show library means, sharing lanes when their labels and confidence intervals do not overlap. ${captions[mode]} Exact total times and confidence intervals are also available in the results table.`),
     svgElement('text', { x: left, y: 22, fill: '#a1a1aa', 'font-size': 11 }, axisLabel),
     svgElement('text', { x: left - 16, y: 22, 'text-anchor': 'end', fill: '#a1a1aa', 'font-size': 11 }, 'Benchmarks'),
     svgElement('text', { x: (left + right) / 2, y: height - 12, 'text-anchor': 'middle', fill: '#a1a1aa', 'font-size': 11 }, axisLabel),
@@ -200,8 +207,8 @@ function renderBenchmarkChart(run, libraries, scenarios, hiddenLibraries) {
   });
   for (const tick of ticks) {
     const horizontal = positionX(tick);
-    const baseline = !milliseconds && tick === 1;
-    const label = milliseconds ? formatMilliseconds(tick) : tick === 1 ? '1× fastest' : `${tick}×`;
+    const baseline = relativeMode && tick === 1;
+    const label = relativeMode ? tick === 1 ? '1× fastest' : `${tick}×` : formatAbsolute(tick);
     svg.append(
       svgElement('line', { x1: horizontal, x2: horizontal, y1: top, y2: bottom, stroke: baseline ? '#71717a' : '#303030' }),
       svgElement('text', { x: horizontal, y: top - 12, 'text-anchor': 'middle', fill: baseline ? '#e4e4e7' : '#a1a1aa', 'font-size': 11 }, label),
@@ -220,15 +227,17 @@ function renderBenchmarkChart(run, libraries, scenarios, hiddenLibraries) {
     group.style.display = hiddenLibraries.has(library.id) ? 'none' : '';
     seriesGroups.push({ id: library.id, group });
     const dots = [];
-    measurements.forEach(({ fastest }, index) => {
+    measurements.forEach(({ fastest, nodeCount }, index) => {
       const layout = rows[index].points.get(library.id);
       if (!layout) return;
       const { result, horizontal, lower, upper, vertical, labelOnLeft } = layout;
       const point = svgElement('g');
       const relative = result.mean_ns / fastest;
-      const mean = milliseconds ? `${formatChartTime(result.mean_ns)} mean` : `${relative.toFixed(2)}× the fastest visible mean, ${formatChartTime(result.mean_ns)}`;
+      const formatMeasuredTime = nanoseconds => perNode ? formatAbsolute(nanoseconds / nodeCount) : formatChartTime(nanoseconds);
+      const mean = relativeMode ? `${relative.toFixed(2)}× the fastest visible mean, ${formatMeasuredTime(result.mean_ns)}` : `${formatMeasuredTime(result.mean_ns)} mean`;
+      const normalization = perNode ? ` Across ${nodeCount.toLocaleString('en-US')} workload nodes including the root, ${formatTime(result.mean_ns)} total.` : '';
       point.append(
-        svgElement('title', {}, `${library.name}, ${scenarios[index].replaceAll('_', ' ')}: ${mean}. 95% confidence interval ${formatChartTime(result.lower_ns)} to ${formatChartTime(result.upper_ns)}.`),
+        svgElement('title', {}, `${library.name}, ${scenarios[index].replaceAll('_', ' ')}: ${mean}. 95% confidence interval ${formatMeasuredTime(result.lower_ns)} to ${formatMeasuredTime(result.upper_ns)}.${normalization}`),
         svgElement('line', { x1: lower, x2: upper, y1: vertical, y2: vertical, stroke: color, 'stroke-width': 1.5 }),
         svgElement('line', { x1: lower, x2: lower, y1: vertical - 2.5, y2: vertical + 2.5, stroke: color, 'stroke-width': 1.5 }),
         svgElement('line', { x1: upper, x2: upper, y1: vertical - 2.5, y2: vertical + 2.5, stroke: color, 'stroke-width': 1.5 }),
@@ -245,7 +254,7 @@ function renderBenchmarkChart(run, libraries, scenarios, hiddenLibraries) {
     svg.append(group);
     const button = element('button');
     button.type = 'button';
-    const hasMeasurements = run.results.some(result => result.library === library.id);
+    const hasMeasurements = run.results.some(result => result.library === library.id && (!perNode || hasNodeCount(result.scenario)));
     button.disabled = !hasMeasurements;
     button.setAttribute('aria-pressed', String(hasMeasurements && !hiddenLibraries.has(library.id)));
     button.setAttribute('aria-controls', 'benchmark-chart');
@@ -273,7 +282,10 @@ function renderBenchmarkChart(run, libraries, scenarios, hiddenLibraries) {
   if (values.length) {
     chart.replaceChildren(svg);
   } else {
-    const empty = element('p', 'No visible measurements. Enable a library above to show its results.', 'chart-empty small');
+    const message = perNode && !scenarios.some(hasNodeCount)
+      ? 'Node counts are unavailable for this run. Choose another view or a newer run.'
+      : 'No visible measurements. Enable a library above to show its results.';
+    const empty = element('p', message, 'chart-empty small');
     empty.setAttribute('role', 'status');
     chart.replaceChildren(empty);
   }
@@ -295,7 +307,7 @@ function renderBenchmarks(history, libraries) {
   });
   select.value = '0';
   const hiddenLibraries = new Set();
-  document.querySelector('#benchmark-chart-milliseconds').addEventListener('change', () => {
+  document.querySelector('#benchmark-chart-mode').addEventListener('change', () => {
     const run = runs[Number(select.value)];
     const scenarios = [...new Set(run.results.map(result => result.scenario))].sort();
     renderBenchmarkChart(run, libraries, scenarios, hiddenLibraries);

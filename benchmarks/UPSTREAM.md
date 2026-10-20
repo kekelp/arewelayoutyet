@@ -12,6 +12,8 @@ Clay uses the `clay-layout` 0.4.0 Rust bindings and their bundled C engine. The 
 
 Clay maps fixed, percentage, fit, and equal-grow sizing, pixel min/max bounds, padding, gaps, and aspect ratios to native properties. It skips child wrapping, in-flow margins, unequal grow weights, and `Expand` minimum sizes. It also rejects unsupported combinations such as min/max bounds on percentage or ratio dimensions and non-integer padding or gaps. Unsupported workloads remain `/`, without silently substituting a different algorithm.
 
+`src/bin/workload_nodes.rs` counts nodes after expanding the same templates with the benchmark's Rust parser, including the root. The collector records these as per-run `node_counts` for the graph's average ns/node view. Means and confidence bounds are divided by the same workload count, not an engine's internal node count or number of node visits. Historical runs with the identical upstream revision reuse counts from these unchanged templates. Runs without known counts cannot use the per-node view. Raw timings are unchanged.
+
 Templates originate in [PanGUI's layout benchmark article](https://www.pangui.io/blog/05-layout-rework-and-benchmarks/), as attributed upstream.
 
 To update, review and copy the upstream files, update the Git revision here and in Cargo.toml, regenerate Cargo.lock, and check adapter limitations and the feature matrix. Dependencies deliberately do not float nightly.
