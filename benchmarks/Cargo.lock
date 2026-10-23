@@ -482,6 +482,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "keru_layout"
+version = "0.1.0"
+source = "git+https://github.com/kekelp/keru?rev=87e94a5660eb53f86dadc498fec7ecec5328077d#87e94a5660eb53f86dadc498fec7ecec5328077d"
+dependencies = [
+ "bumpalo",
+]
+
+[[package]]
 name = "libc"
 version = "0.2.191"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -984,6 +992,7 @@ dependencies = [
  "backer",
  "clay-layout",
  "criterion",
+ "keru_layout",
  "morphorm",
  "ordered-float",
  "ply-engine",
