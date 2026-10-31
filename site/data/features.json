@@ -9,7 +9,7 @@
     {"id": "clay-layout", "name": "clay-rs", "version": "0.4.0 (C bindings)", "releaseDate": "2025-06-03", "usedBy": [], "url": "https://crates.io/crates/clay-layout", "source": "https://docs.rs/clay-layout/0.4.0/clay_layout/layout/index.html"},
     {"id": "ply-engine", "name": "Ply", "version": "1.1.1", "releaseDate": "2026-04-07", "usedBy": [], "url": "https://crates.io/crates/ply-engine", "source": "https://docs.rs/ply-engine/1.1.1/ply_engine/layout/index.html"},
     {"id": "backer", "name": "Backer", "version": "0.12.0", "releaseDate": "2026-05-30", "usedBy": [], "url": "https://crates.io/crates/backer", "source": "https://docs.rs/backer/0.12.0/backer/struct.Layout.html"},
-    {"id": "keru_layout", "name": "keru_layout", "version": "0.1.0 (pinned Git)", "releaseDate": "2026-10-23", "usedBy": [{"name": "keru", "url": "https://github.com/kekelp/keru"}], "url": "https://github.com/kekelp/keru", "source": "https://github.com/kekelp/keru/blob/87e94a5660eb53f86dadc498fec7ecec5328077d/crates/keru_layout/src/lib.rs"}
+    {"id": "keru_layout", "name": "keru_layout", "version": "0.1.0 (pinned Git)", "releaseDate": "2026-10-31", "usedBy": [{"name": "keru", "url": "https://github.com/kekelp/keru"}], "url": "https://github.com/kekelp/keru_layout", "source": "https://github.com/kekelp/keru_layout/blob/04869bcc2b1dcd936defd002b57077d53fec38d7/src/lib.rs"}
   ],
   "features": [
     {"name": "Horizontal and vertical stacks", "support": ["yes", "yes", "yes", "yes", "yes", "yes", "yes", "yes", "yes"], "note": "Row and column flows. This does not imply CSS flexbox conformance."},
@@ -55,8 +55,8 @@
     },
     {
       "name": "Incremental measuring",
-      "support": ["yes", "no", "yes", "yes", "partial", "partial", "partial", "no", "no"],
-      "note": "Reuse unchanged measurements across layout passes and remeasure affected nodes. Taffy and Yoga cache layout results with dirty-node invalidation. Torin tracks dirty nodes and their layout dependencies. Morphorm recomputes the tree on each layout pass. ui_layout caches intrinsic layout results but has no public invalidation API. Clay and Ply cache text measurements, but rebuild element layout each frame rather than incrementally measuring a retained tree. Backer runs full resolve and allocation passes, without dirty-node invalidation. keru solves the full tree on each layout pass.",
+      "support": ["yes", "no", "yes", "yes", "partial", "partial", "partial", "no", "yes"],
+      "note": "Reuse unchanged measurements across layout passes and remeasure affected nodes. Taffy and Yoga cache layout results with dirty-node invalidation. Torin tracks dirty nodes and their layout dependencies. Morphorm recomputes the tree on each layout pass. ui_layout caches intrinsic layout results but has no public invalidation API. Clay and Ply cache text measurements, but rebuild element layout each frame rather than incrementally measuring a retained tree. Backer runs full resolve and allocation passes, without dirty-node invalidation.",
       "sources": {
         "taffy": "https://github.com/DioxusLabs/taffy/blob/4e59968eda29ceeb0bbaeb3993c8cd38baa3d0a6/src/tree/taffy_tree.rs",
         "morphorm": "https://docs.rs/morphorm/0.9.0/src/morphorm/layout.rs.html",
