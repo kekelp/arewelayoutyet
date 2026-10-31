@@ -484,9 +484,10 @@ dependencies = [
 [[package]]
 name = "keru_layout"
 version = "0.1.0"
-source = "git+https://github.com/kekelp/keru?rev=87e94a5660eb53f86dadc498fec7ecec5328077d#87e94a5660eb53f86dadc498fec7ecec5328077d"
+source = "git+https://github.com/kekelp/keru_layout?rev=04869bcc2b1dcd936defd002b57077d53fec38d7#04869bcc2b1dcd936defd002b57077d53fec38d7"
 dependencies = [
  "bumpalo",
+ "slotmap",
 ]
 
 [[package]]

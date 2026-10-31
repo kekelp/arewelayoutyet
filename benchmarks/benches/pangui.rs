@@ -222,7 +222,7 @@ fn benchmark_native_libraries(group: &mut BenchmarkGroup<WallTime>, name: &str, 
     #[cfg(feature = "keru")]
     if let Some(tree) = KeruLayoutTree::new(root, width, height) {
         let mut tree = Some(tree);
-        group.bench_function(BenchmarkId::new(name, "keru"), |b| {
+        group.bench_function(BenchmarkId::new(name, "keru_layout"), |b| {
             bench_layout(b, &mut tree, || unreachable!(), |tree| tree.mark_all_dirty(), |tree| tree.compute_layout())
         });
     }
