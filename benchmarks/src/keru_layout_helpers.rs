@@ -101,7 +101,7 @@ impl Tree {
     fn push(&mut self, parent: u32, params: LayoutParams) -> u32 {
         let i = self.nodes.len() as u32;
         let rect = Xy::new([0.0, 0.0], [0.0, 0.0]);
-        self.nodes.push(Node { parent, first_child: None, last_child: None, next_sibling: None, params, layout: NodeLayoutData::EMPTY, rect });
+        self.nodes.push(Node { parent, first_child: None, last_child: None, next_sibling: None, params, layout: NodeLayoutData::new(), rect });
         i
     }
 
@@ -124,8 +124,8 @@ impl TreeAdapter for Tree {
         0
     }
 
-    fn parent(&self, i: u32) -> u32 {
-        self.nodes[i as usize].parent
+    fn parent(&self, i: u32) -> Option<u32> {
+        (i != 0).then(|| self.nodes[i as usize].parent)
     }
 
     fn first_child(&self, i: u32) -> Option<u32> {
@@ -160,10 +160,6 @@ impl TreeAdapter for Tree {
         0.0
     }
 
-    fn window_size(&self) -> Xy<f32> {
-        self.window_size
-    }
-
     fn write_output_rect(&mut self, i: u32, rect: XyRect, _local_rect: XyRect) {
         self.nodes[i as usize].rect = rect;
     }
@@ -182,7 +178,7 @@ pub struct KeruLayoutTree {
 }
 
 impl KeruLayoutTree {
-    /// The template root is added as the only child of the tree's root node, which always takes the whole window.
+    /// The template root is added as the only child of the tree's root node, which is `Fill` and takes the whole window.
     pub fn new(template: &LayoutNode, width: f32, height: f32) -> Option<Self> {
         let mut tree = Tree::with_capacity(count(template) + 1, Xy::new(width, height));
         add(&mut tree, 0, template, None)?;
@@ -193,7 +189,8 @@ impl KeruLayoutTree {
     pub fn mark_all_dirty(&mut self) {}
 
     pub fn compute_layout(&mut self) {
-        self.tree.solve_layout();
+        let window_size = self.tree.window_size;
+        self.tree.solve_layout(window_size);
         std::hint::black_box(&self.tree.nodes);
     }
 }
